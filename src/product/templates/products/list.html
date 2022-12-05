@@ -10,17 +10,26 @@
 
 
 <div class="card">
-    <form action="" method="get" class="card-header">
+    <form action="" method="GET" class="card-header">
         <div class="form-row justify-content-between">
             <div class="col-md-2">
                 <input type="text" name="title" placeholder="Product Title" class="form-control">
             </div>
             <div class="col-md-2">
                 <select name="variant" id="" class="form-control">
-                    <option selected disabled>--Select A Variant--</option>
+                  <option selected disabled>--Select A Variant--</option>
+                  {% for variant in variations %}
+                      <option value="{{variant.title}}" ><b>{{ variant.title }}</b></option>
+                      {% for i in variants %}
 
+                      <option value="{{ i.variant_title }}" >{% ifchanged %} {{ i.variant_title }}{% endifchanged %}</option>
+
+                      {% endfor %}
+
+                  {% endfor %}
                 </select>
-            </div>
+              </div>
+
 
             <div class="col-md-3">
                 <div class="input-group">
@@ -55,48 +64,25 @@
                 </thead>
 
                 <tbody>
+                {% for i in products %}
                 <tr>
-                    <td>1</td>
-                    <td>T-Shirt <br> Created at : 25-Aug-2020</td>
-                    <td>Quality product in low cost</td>
+                    
+                    <td>{{i.id}}</td>
+                    <td>{{i.title}} <br> Created at : {{ i.created_at |timesince }}</td>
+                    <td>{{i.description}}</td>
                     <td>
                         <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
+                            {% for var in i.productvariantprice_set.all %}
                                 <dt class="col-sm-3 pb-0">
-                                    XL/ Black/ Full
+                                    {{var.product_variant_one.variant_title}}/ {{var.product_variant_two.variant_title}}/ {{var.product_variant_three.variant_title}}
                                 </dt>
                                 <dd class="col-sm-9">
                                     <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
+                                        <dd class="col-sm-4 pb-0">Price : {{var.price}}</dd>
+                                        <dd class="col-sm-8 pb-0">InStock : {{var.stock}}.</dd>
                                     </dl>
                                 </dd>
-                                <dt class="col-sm-3 pb-0">
-                                    XL/ Black/ Half
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
-                                    </dl>
-                                </dd>
-                                <dt class="col-sm-3 pb-0">
-                                    L/ Black/ Full
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
-                                    </dl>
-                                </dd>
-                                <dt class="col-sm-3 pb-0">
-                                    L/ Black/ Half
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <dl class="row mb-0">
-                                        <dd class="col-sm-4 pb-0">Price : 200.0</dd>
-                                        <dd class="col-sm-8 pb-0">InStock : 50.</dd>
-                                    </dl>
-                                </dd>
+                                {% endfor %}
                             </dl>
                         <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more
                         </button>
@@ -106,7 +92,9 @@
                             <a href="" class="btn btn-success">Edit</a>
                         </div>
                     </td>
+                    
                 </tr>
+                {% endfor %}
                 </tbody>
 
             </table>
@@ -117,7 +105,7 @@
     <div class="card-footer">
         <div class="row justify-content-between">
             <div class="col-md-6">
-                <p>Showing 1 to 10 out of 100</p>
+                <p>Showing {{products.0.id}} to {{products.1.id}} out of {{products_count}}</p>
             </div>
             <div class="col-md-2">
 
@@ -125,4 +113,30 @@
         </div>
     </div>
 </div>
+
+<nav class="mt-4" aria-label="Page navigation sample">
+	{% if products.has_other_pages %}
+  <ul class="pagination">
+		{% if products.has_previous %}
+    <li class="page-item"><a class="page-link" href="?page={{products.previous_page_number}}"><</a></li>
+		{% else %}
+		<li class="page-item disabled"><a class="page-link" href="#"><</a></li>
+		{% endif %}
+		{% for i in products.paginator.page_range %}
+			{% if products.number == i %}
+    <li class="page-item active"><a class="page-link" href="#">{{i}}</a></li>
+			{% else %}
+    <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+			{% endif %}
+		{% endfor %}
+		{% if products.has_next %}
+		<li class="page-item"><a class="page-link" href="?page={{products.next_page_number}}">></a></li>
+		{% else %}
+    <li class="page-item disabled"><a class="page-link" href="#">></a></li>
+		{% endif %}
+  </ul>
+  {% endif %}
+</nav>
 {% endblock %}
+
+
